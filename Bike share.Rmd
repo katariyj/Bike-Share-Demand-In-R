@@ -5,6 +5,7 @@ output: html_notebook
 
 
 ```{r}
+# BIKE SHARE DEMAND
 bike <- read.csv('C:/Users/Jai Katariya/Desktop/Jai Katariya/Self Learning/R/Course 2-R-Course-HTML-Notes/R-Course-HTML-Notes/R-for-Data-Science-and-Machine-Learning/Training Exercises/Machine Learning Projects/CSV files for ML Projects/bikeshare.csv')
 bike <- as.data.frame(bike)
 head(bike)
