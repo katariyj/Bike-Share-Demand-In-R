@@ -1,0 +1,152 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+bike <- read.csv('C:/Users/Jai Katariya/Desktop/Jai Katariya/Self Learning/R/Course 2-R-Course-HTML-Notes/R-Course-HTML-Notes/R-for-Data-Science-and-Machine-Learning/Training Exercises/Machine Learning Projects/CSV files for ML Projects/bikeshare.csv')
+bike <- as.data.frame(bike)
+head(bike)
+```
+```{r}
+str(bike)
+```
+
+```{r}
+summary(bike)
+```
+
+```{r}
+tail(bike)
+```
+
+Exploratory Data Analysis¶
+```{r}
+
+library(Amelia)
+missmap(bike, main = 'missing map', col = c('yellow', 'black'), legend =F)
+
+```
+
+ Create a scatter plot of count vs temp.
+ 
+```{r}
+
+library(ggplot2)
+
+temp_scatterplot <- ggplot(bike, aes(temp, count)) +
+  
+                    geom_point(aes(color = temp),alpha = 0.2)+ 
+  
+                    xlab('Temperature') + ylab("Count of Rentals")
+
+print(temp_scatterplot)
+
+```
+Plot count versus datetime as a scatterplot with a color gradient based on temperature. 
+Convert the datetime column into POSIXct before plotting.
+
+```{r}
+
+bike$datetime <- as.POSIXct(bike$datetime)
+
+datetime_scatterplot <- ggplot(bike, aes(datetime, count)) + 
+  
+                        geom_point(alpha = 0.3, aes(color = temp))+
+  
+                        scale_color_gradient(low = 'green', high = 'red') +
+  
+                        xlab('Time') + ylab("Count of Rentals")
+
+print(datetime_scatterplot)
+
+```
+```{r}
+
+cor_tempVscount <- cor(bike[, c('temp', 'count')])
+print(cor_tempVscount)
+
+```
+
+Created a boxplot to explore the season data with the y axis indicating count and the x axis begin a box for each season.
+
+```{r}
+
+seasons <- ggplot(bike, aes(factor(season), count)) + geom_boxplot(aes(color = factor(season))) + xlab('Season') + ylab("Count of Rentals")
+
+print(seasons)
+
+```
+
+Feature Engineering
+
+Before dealing with date time column, we need to feature it.
+
+Created an "hour" column that takes the hour from the datetime column.
+
+```{r}
+
+bike$hour <- sapply(bike$datetime, function(x){format(x, '%H')})
+head(bike)
+```
+Now create a scatterplot of count versus hour, with color scale based on temp. Only use bike data where workingday==1.
+Additions:Used the additional layer: scale_color_gradientn(colors=c('color1',color2,etc..)) where the colors argument is a vector gradient of colors you choose, not just high and low. 
+Used position=position_jitter(w=1, h=0) inside of geom_point() and check out what it does.
+
+```{r}
+
+bike_data <- subset(bike, bike$workingday == 1)
+
+hour_scatterplot <- ggplot(bike_data,aes(hour, count)) + geom_point(aes(color = temp), 
+                    
+                    position =  position_jitter(w = 1, h=0), alpha = 0.5)+ scale_color_gradientn(colors= c('dark blue', 'blue', 'light green', 'yellow', 'orange', 'red')) + xlab('Hour') + ylab("Count of Rentals")
+
+print(hour_scatterplot)
+
+```
+
+```{r}
+
+library(dplyr)
+hour2_scatterplot <- ggplot(filter(bike, workingday ==0), aes(hour, count)) + 
+  
+                    geom_point(aes(color = temp), position = position_jitter(w =1, h = 0), 
+                               
+                    alpha = 0.5) + scale_color_gradientn(colors= c('dark blue', 'blue', 
+                                                                   
+                    'light green', 'yellow', 'orange', 'red')) + xlab('Hour') + ylab("Count of Rentals")
+
+print(hour2_scatterplot)
+
+```
+
+Compare Count of Rentals with Casual and Registered.
+
+```{r}
+
+Ca_scatterplot <- ggplot(bike,aes(hour, casual)) + geom_point(colour ='Red') + xlab('Hour') + ylab("Count of Casual Rentals")
+print(Ca_scatterplot)
+
+```
+```{r}
+
+Re_scatterplot <- ggplot(bike,aes(hour, registered)) + geom_point(colour ='blue') + xlab('Hour') + ylab("Count of Registered Rentals")
+print(Re_scatterplot)
+
+```
+
+For an interactive plot, I installed plotly library. 
+
+```{r}
+#install.packages('plotly')
+library(ggplot2)
+library(plotly)
+
+CountVsTemp <- ggplot(bike, aes(temp, count)) + geom_point(aes(color = temp)) + xlab("Temperature") + ylab("Count of Rentals")
+
+gpl <- ggplotly(CountVsTemp)
+
+print(gpl)
+```
+
